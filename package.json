@@ -1,0 +1,22 @@
+{
+  "name": "cse341-pers-project",
+  "version": "1.0.0",
+  "description": "My personal project",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fercub496/cse341-pers-project.git"
+  },
+  "author": "Fernando Cuba",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fercub496/cse341-pers-project/issues"
+  },
+  "homepage": "https://github.com/fercub496/cse341-pers-project#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
