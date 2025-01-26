@@ -3,8 +3,10 @@ const ObjectId = require('mongodb').ObjectId;
 
 const getAll = async (req, res) => {
      //#swagger.tags =['Users']
-    const result = await mongodb.getDatabase().db().collection('users').find();
-    result.toArray().then((users)=>{
+    mongodb.getDatabase().db().collection('users').find().toArray((err, users) => {
+        if (err){
+            res.status(400).json({message: err});
+        }
         res.setHeader('Content-Type', 'application/json');
         res.status(200).json(users);
     });
@@ -13,11 +15,16 @@ const getAll = async (req, res) => {
 const getSingle = async (req,res)=>{
     //#swagger.tags =['Users']
     const userId = new ObjectId(req.params.id);
-    const result = await mongodb.getDatabase().db().collection('users').findOne({ _id: userId});
+    mongodb.getDatabase().db().collection('users').findOne({ _id: userId}).toArray((err, result)=> {
+        if(err){
+            res.status(400).json({message: err});
+        }
         res.setHeader('Content-Type', 'application/json');
         res.status(200).json(result);
+    });        
    };
-   const createUser = async(req, res) => {
+
+const createUser = async(req, res) => {
     //#swagger.tags =['Users']
     const user = {
         firstName: req.body.firstName,
@@ -46,6 +53,7 @@ const updateUser = async(req, res) => {
         birthday: req.body.birthday
     };
     const response = await mongodb.getDatabase().db().collection('users').replaceOne( {_id: userId},user);
+    console.log(response);
     if(response.modifiedCount > 0) {
         res.status(204).send();
     } else {
@@ -58,7 +66,7 @@ const deleteUser = async (req, res) => {
     //#swagger.tags =['Users']
     const userId = new ObjectId(req.params.id);
     const response = await mongodb.getDatabase().db().collection('users').deleteOne({_id: userId})
-     
+    console.log(response);
     if (response.deletedCount > 0){
         res.status(204).send();
     } else{

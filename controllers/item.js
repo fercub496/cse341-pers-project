@@ -3,7 +3,7 @@ const ObjectId = require('mongodb').ObjectId;
 
 const getAllitems = async (req, res) => {
      //#swagger.tags =['Items']
-    mongodb.getDatabase().db().collection('items').find().toArray((err,items) =>{
+    mongodb.getDatabase().db().collection('items').find().toArray((err, items) =>{
         if (err) {
             res.status(400).json({ message: err});
         }
@@ -15,9 +15,13 @@ const getAllitems = async (req, res) => {
 const getItemById = async (req,res)=>{
     //#swagger.tags =['Items']
     const itemId = new ObjectId(req.params.id);
-    const result = await mongodb.getDatabase().db().collection('items').findOne({ _id: itemId});
+    mongodb.getDatabase().db().collection('items').findOne({ _id: itemId}).toArray((err, result)=> {
+        if (err){
+            res.status(400).json({ message: err});
+        }
         res.setHeader('Content-Type', 'application/json');
-        res.status(200).json(result);
+        res.status(200).json(result[0]);
+    });        
    };
 
 const createItem = async(req, res) => {
@@ -49,6 +53,7 @@ const updateItem = async(req, res) => {
         discount: req.body.discount
     };
     const response = await mongodb.getDatabase().db().collection('items').replaceOne( {_id: itemId},item);
+    console.log(response);
     if(response.modifiedCount > 0) {
         res.status(204).send();
     } else {
@@ -61,7 +66,7 @@ const deleteItem = async (req, res) => {
     //#swagger.tags =['Items']
     const itemId = new ObjectId(req.params.id);
     const response = await mongodb.getDatabase().db().collection('items').deleteOne({_id: itemId})
-     
+     console.log(response);
     if (response.deletedCount > 0){
         res.status(204).send();
     } else{
