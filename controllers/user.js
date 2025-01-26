@@ -17,4 +17,54 @@ const getSingle = async (req,res)=>{
         res.setHeader('Content-Type', 'application/json');
         res.status(200).json(result);
    };
-   module.exports = {getAll, getSingle};
+   const createUser = async(req, res) => {
+    //#swagger.tags =['Users']
+    const user = {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        districtAddress: req.body.districtAddress,
+        birthday: req.body.birthday
+    };
+    const response = await mongodb.getDatabase().db().collection('users').insertOne(user);
+    if(response.acknowledged) {
+        res.status(204).send();
+    } else {
+        res.status(500).json(response.error || 'Some error occurred while creating this user.');
+    }
+
+};
+
+const updateUser = async(req, res) => {
+    //#swagger.tags =['Users']
+    const userId = new ObjectId(req.params.id);
+    const user = {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        districtAddress: req.body.districtAddress,
+        birthday: req.body.birthday
+    };
+    const response = await mongodb.getDatabase().db().collection('users').replaceOne( {_id: userId},user);
+    if(response.modifiedCount > 0) {
+        res.status(204).send();
+    } else {
+        res.status(500).json(response.error || 'Some error occurred while creating this user.');
+    }
+
+};
+
+const deleteUser = async (req, res) => {
+    //#swagger.tags =['Users']
+    const userId = new ObjectId(req.params.id);
+    const response = await mongodb.getDatabase().db().collection('users').deleteOne({_id: userId})
+     
+    if (response.deletedCount > 0){
+        res.status(204).send();
+    } else{
+        res.status(500).json(response.error || 'Some error occurred while deleting the user.');
+    }
+
+};
+
+module.exports = {getAll, getSingle, createUser, updateUser, deleteUser};
