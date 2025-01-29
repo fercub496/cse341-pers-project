@@ -5,7 +5,7 @@
     "description": "Store items Api",
     "version": "1.0.0"
   },
-  "host": "https://personalproject-2psd.onrender.com/",
+  "host": "personalproject-2psd.onrender.com",
   "basePath": "/",
   "schemes": [
     "https"
