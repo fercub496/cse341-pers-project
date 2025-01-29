@@ -3,25 +3,31 @@ const ObjectId = require('mongodb').ObjectId;
 
 const getAllitems = async (req, res) => {
      //#swagger.tags =['Items']
-    mongodb.getDatabase().db().collection('items').find().toArray((err, items) =>{
-        if (err) {
-            res.status(400).json({ message: err});
-        }
+     try{
+        const items = await mongodb.getDatabase().db().collection('items').find().toArray();
         res.setHeader('Content-Type', 'application/json');
-        res.status(200).json(items);
-    });
-};
+        res.status(200).json(items);  
+     } catch(err) {
+        res.status(400).json({ message: err.message});
+            }
+     };
 
 const getItemById = async (req,res)=>{
     //#swagger.tags =['Items']
-    const itemId = new ObjectId(req.params.id);
-    mongodb.getDatabase().db().collection('items').findOne({ _id: itemId}).toArray((err, result)=> {
-        if (err){
-            res.status(400).json({ message: err});
+    const itemId = req.params.id;
+    if (!ObjectId.isValid(req.params.id)) {
+        res.status(400).json({message:'Must use a valid item id to find an item.'});
+      }
+   try{
+    const item = await mongodb.getDatabase().db().collection('items').findOne({ _id: new ObjectId(itemId)});
+        if (!item){
+            res.status(400).json({ message: 'Item not found.'});
         }
         res.setHeader('Content-Type', 'application/json');
-        res.status(200).json(result[0]);
-    });        
+        res.status(200).json(item);
+    } catch (err){
+        res.status(500).json({message: 'Error retrieving item.', error: err.message }); 
+    }     
    };
 
 const createItem = async(req, res) => {
@@ -44,6 +50,9 @@ const createItem = async(req, res) => {
 
 const updateItem = async(req, res) => {
     //#swagger.tags =['Items']
+    if (!ObjectId.isValid(req.params.id)) {
+        res.status(400).json('Must use a valid item id to update an item.');
+      }
     const itemId = new ObjectId(req.params.id);
     const item = {
         itemName: req.body.itemName,
@@ -64,6 +73,9 @@ const updateItem = async(req, res) => {
 
 const deleteItem = async (req, res) => {
     //#swagger.tags =['Items']
+    if (!ObjectId.isValid(req.params.id)) {
+        res.status(400).json('Must use a valid item id to delete an item.');
+      }
     const itemId = new ObjectId(req.params.id);
     const response = await mongodb.getDatabase().db().collection('items').deleteOne({_id: itemId})
      console.log(response);
